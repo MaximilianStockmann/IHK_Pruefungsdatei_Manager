@@ -13,6 +13,11 @@ namespace IHK_Pruefungsdatei_Manager
     public partial class DefaultManager : Form
     {
         private Label label1 = new Label();
+        GroupBox choiceGrouping = new GroupBox();
+        ComboBox yearPicker = new ComboBox();
+        ComboBox seasonPicker = new ComboBox();
+        GroupBox filePickerGrouping = new GroupBox();
+        Label label = new Label();
 
         private object[] seasons = new object[] {
         "Frühling",
@@ -41,26 +46,17 @@ namespace IHK_Pruefungsdatei_Manager
         private void init()
         {
             this.Fullscreen();
-            this.initFilePickerGrouping();
-            this.initChoiceGrouping();
+            this.initComponents();
+            this.initLayout();
         }
 
         private void initChoiceGrouping()
         {
-            GroupBox choiceGrouping = new GroupBox();
-            choiceGrouping.Dock = DockStyle.Top;
-
-            ComboBox yearPicker = new ComboBox();
             yearPicker.Items.AddRange(years);
-
-            ComboBox seasonPicker = new ComboBox();
             seasonPicker.Items.AddRange(seasons);
 
             choiceGrouping.Controls.Add(seasonPicker);
             choiceGrouping.Controls.Add(yearPicker);
-
-            yearPicker.Dock = DockStyle.Left;
-            seasonPicker.Dock = DockStyle.Left;
 
             // TODO: Add margin to seasonPicker for nicer visual
 
@@ -69,45 +65,39 @@ namespace IHK_Pruefungsdatei_Manager
 
         private void initFilePickerGrouping()
         {
-            GroupBox filePickerGrouping = new GroupBox();
             //filePickerGrouping.Dock = DockStyle.Fill;
 
-            Label label = this.CreateMyLabel();
             filePickerGrouping.Controls.Add(label);
 
-            filePickerGrouping.Dock = DockStyle.Top;
 
             this.Controls.Add(filePickerGrouping);
         }
-        public Label CreateMyLabel()
+        public void CreateMyLabel()
         {
             // Set the border to a three-dimensional border.
-            label1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            label.BorderStyle = System.Windows.Forms.BorderStyle.None;
             // Set the ImageList to use for displaying an image.
-            label1.ImageList = new ImageList();
+            label.ImageList = new ImageList();
 
             // Use the second image in imageList1.
-            label1.ImageIndex = 1;
+            label.ImageIndex = 1;
 
             // Align the image to the top left corner.
-            label1.ImageAlign = ContentAlignment.TopLeft;
+            label.ImageAlign = ContentAlignment.TopLeft;
 
             // Specify that the text can display mnemonic characters.
-            label1.UseMnemonic = true;
+            label.UseMnemonic = true;
             // Set the text of the control and specify a mnemonic character.
-            label1.Text = "Test Text:";
+            label.Text = "Test Text:";
 
             /* Set the size of the control based on the PreferredHeight and PreferredWidth values. */
-            label1.Size = new Size(label1.PreferredWidth, label1.PreferredHeight);
+            label.Size = new Size(label1.PreferredWidth, label1.PreferredHeight);
 
-            label1.Dock = DockStyle.Top;
+            label.AllowDrop = true;
+            label.DragOver += label_DragOver;
+            label.DragDrop += label_DragDrop;
 
-            label1.AllowDrop = true;
-            label1.DragOver += label1_DragOver;
-            label1.DragDrop += label1_DragDrop;
-
-            //...Code to add the control to the form...
-            return label1;
+            this.Controls.Add(label);
         }
 
         public void Fullscreen()
@@ -115,20 +105,38 @@ namespace IHK_Pruefungsdatei_Manager
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
         }
 
-        private void label1_DragOver(object sender, DragEventArgs e)
+        private void initComponents()
+        {
+            this.CreateMyLabel();
+            this.initFilePickerGrouping();
+            this.initChoiceGrouping();
+        }
+
+        private void initLayout()
+        {
+            label.Dock = DockStyle.Top;
+            filePickerGrouping.Dock = DockStyle.Top;
+            choiceGrouping.Dock = DockStyle.Top;
+            yearPicker.Dock = DockStyle.Left;
+            seasonPicker.Dock = DockStyle.Left;
+        }
+
+        // Visual effects on drag hover
+        private void label_DragOver(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.All;
         }
 
         // React to the drop on this control
-        private void label1_DragDrop(object sender, DragEventArgs e)
+        private void label_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 foreach (string filePath in files)
                 {
-                    label1.Text = filePath;
+                    // TODO: typechecking so that this doesn't throw an error
+                    (sender as Label).Text = filePath;
                     Console.WriteLine(filePath);
                 }
             }
