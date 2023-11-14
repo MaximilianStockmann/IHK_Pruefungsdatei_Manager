@@ -23,7 +23,7 @@ namespace IHK_Pruefungsdatei_Manager
 
     public partial class DefaultManager : Form
     {
-        private string basePath = @"C:\Users\Max\IHK_Pruefungsdatei_Manager_Testordner";
+        private string basePath = @"C:\Users\Max\IHK_Pruefungsdatei_Manager_Testordner\";
 
         private Label label1 = new Label();
         GroupBox choiceGrouping = new GroupBox();
@@ -220,6 +220,7 @@ namespace IHK_Pruefungsdatei_Manager
 
         private void writeFile(string filePath, string newFilePath)
         {
+            Console.WriteLine("Test");
             File.Copy(filePath, newFilePath);
         }
     }
