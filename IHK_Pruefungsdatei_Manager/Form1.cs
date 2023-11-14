@@ -5,8 +5,11 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+// TODO: Refactor Label Text into actual DataModel
 
 namespace IHK_Pruefungsdatei_Manager
 {
@@ -170,11 +173,13 @@ namespace IHK_Pruefungsdatei_Manager
                     // TODO: typechecking so that this doesn't throw an error
                     (sender as Label).Text = filePath;
                     Console.WriteLine(filePath);
-                    Console.WriteLine(GenerateFilePath("C:\\Max\\Users\\IHK_Pruefungsdatei_Manager_Testordner\\"));
+                    Console.WriteLine(GenerateFilePath("C:\\Users\\Max\\IHK_Pruefungsdatei_Manager_Testordner\\"));
+                    writeFile(filePath, GenerateFilePath("C:\\Users\\Max\\IHK_Pruefungsdatei_Manager_Testordner\\"));
                 }
             }
         }
 
+        // TODO: Error handling an automatic generation of missing folders
         private string GenerateFilePath(string basePath)
         {
             string filePath;
@@ -183,9 +188,14 @@ namespace IHK_Pruefungsdatei_Manager
             string season = this.seasonPicker.SelectedItem.ToString();
             string tradeDiscipline = this.tradeDisciplinePicker.SelectedItem.ToString();
 
-            filePath = basePath + year + "_" + season + "_" + tradeDiscipline; // how to get doctype here?
+            filePath = basePath + year + "_" + season + "_" + tradeDiscipline + ".docx"; // how to get doctype here?
 
             return filePath;
+        }
+
+        private void writeFile(string filePath, string newFilePath)
+        {
+            File.Copy(filePath, newFilePath);
         }
     }
 }
