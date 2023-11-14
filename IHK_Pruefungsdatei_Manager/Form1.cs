@@ -12,6 +12,8 @@ namespace IHK_Pruefungsdatei_Manager
 {
     public partial class DefaultManager : Form
     {
+        private Label label1 = new Label();
+
         private object[] seasons = new object[] {
         "Frühling",
         "Winter"
@@ -79,9 +81,6 @@ namespace IHK_Pruefungsdatei_Manager
         }
         public Label CreateMyLabel()
         {
-            // Create an instance of a Label.
-            Label label1 = new Label();
-
             // Set the border to a three-dimensional border.
             label1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             // Set the ImageList to use for displaying an image.
@@ -105,6 +104,7 @@ namespace IHK_Pruefungsdatei_Manager
 
             label1.AllowDrop = true;
             label1.DragOver += label1_DragOver;
+            label1.DragDrop += label1_DragDrop;
 
             //...Code to add the control to the form...
             return label1;
@@ -115,11 +115,23 @@ namespace IHK_Pruefungsdatei_Manager
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
         }
 
-        private void label1_DragOver(object sender, DragEventArgs e) =>
+        private void label1_DragOver(object sender, DragEventArgs e)
+        {
             e.Effect = DragDropEffects.All;
+        }
 
         // React to the drop on this control
-        private void textBox1_DragDrop(object sender, DragEventArgs e) =>
-            testLabel.Text = (string)e.Data.GetData(typeof(string));
+        private void label1_DragDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string filePath in files)
+                {
+                    label1.Text = filePath;
+                    Console.WriteLine(filePath);
+                }
+            }
+        }
     }
 }
