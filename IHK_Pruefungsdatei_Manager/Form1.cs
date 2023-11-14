@@ -23,12 +23,16 @@ namespace IHK_Pruefungsdatei_Manager
 
     public partial class DefaultManager : Form
     {
+        private string basePath = @"C:\Users\Max\IHK_Pruefungsdatei_Manager_Testordner";
+
         private Label label1 = new Label();
         GroupBox choiceGrouping = new GroupBox();
         ComboBox yearPicker = new ComboBox();
         ComboBox seasonPicker = new ComboBox();
         ComboBox tradeDisciplinePicker = new ComboBox();
         GroupBox filePickerGrouping = new GroupBox();
+        Button confirmButton = new Button();
+        TableLayoutPanel filePickerTable = new TableLayoutPanel();
 
         private object[] seasons = new object[] {
             "Frühling",
@@ -90,18 +94,38 @@ namespace IHK_Pruefungsdatei_Manager
         {
             int DocumentTypeEnumSize = Enum.GetNames(typeof(DocumentType)).Length;
 
-            for (int i = DocumentTypeEnumSize; i >= 0; i--)
+            this.filePickerTable.RowCount = 4;
+            this.filePickerTable.ColumnCount = 2;
+
+            filePickerGrouping.Controls.Add(this.filePickerTable);
+
+            this.confirmButton.Text = "Anwenden";
+            this.filePickerGrouping.Controls.Add(this.confirmButton);
+            this.confirmButton.Dock = DockStyle.Bottom;
+
+            this.filePickerGrouping.Controls.Add(this.confirmButton);
+
+            for (int i = DocumentTypeEnumSize-1; i >= 0; i--)
             {
                 Console.WriteLine(i);
-                Label label = new Label();
-                label.Dock = DockStyle.Top;
-                label.Text = ((DocumentType)i).ToString();
+                Label fileLabel = new Label();
+                Label descriptorLabel = new Label();
 
-                label.AllowDrop = true;
-                label.DragOver += label_DragOver;
-                label.DragDrop += label_DragDrop;
-                filePickerGrouping.Controls.Add(label);
+                descriptorLabel.Dock = DockStyle.Left;
+                descriptorLabel.Text = ((DocumentType)i).ToString();
+
+                fileLabel.Dock = DockStyle.Top;
+                fileLabel.Text = "Datei einfügen";
+
+                fileLabel.AllowDrop = true;
+                fileLabel.DragOver += label_DragOver;
+                fileLabel.DragDrop += label_DragDrop;
+
+                this.filePickerTable.Controls.Add(descriptorLabel);
+                this.filePickerTable.Controls.Add(fileLabel);
             }
+
+            //this.confirmButton.Dock = DockStyle.Fill;
 
             this.Controls.Add(filePickerGrouping);
         }
@@ -146,9 +170,11 @@ namespace IHK_Pruefungsdatei_Manager
             this.initChoiceGrouping();
         }
 
+        // TODO: Make filePath Column larger, so that whole Filepath is Shown
         private void initLayout()
         {
-            filePickerGrouping.Dock = DockStyle.Top;
+            filePickerTable.Dock = DockStyle.Left;
+            filePickerGrouping.Dock = DockStyle.Fill;
             choiceGrouping.Dock = DockStyle.Top;
             yearPicker.Dock = DockStyle.Left;
             seasonPicker.Dock = DockStyle.Left;
@@ -173,14 +199,13 @@ namespace IHK_Pruefungsdatei_Manager
                     // TODO: typechecking so that this doesn't throw an error
                     (sender as Label).Text = filePath;
                     Console.WriteLine(filePath);
-                    Console.WriteLine(GenerateFilePath("C:\\Users\\Max\\IHK_Pruefungsdatei_Manager_Testordner\\"));
-                    writeFile(filePath, GenerateFilePath("C:\\Users\\Max\\IHK_Pruefungsdatei_Manager_Testordner\\"));
+                    writeFile(filePath, GenerateFilePath());
                 }
             }
         }
 
         // TODO: Error handling an automatic generation of missing folders
-        private string GenerateFilePath(string basePath)
+        private string GenerateFilePath()
         {
             string filePath;
 
