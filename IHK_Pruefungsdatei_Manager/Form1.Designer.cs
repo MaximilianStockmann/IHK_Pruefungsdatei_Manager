@@ -1,7 +1,7 @@
 ﻿
 namespace IHK_Pruefungsdatei_Manager
 {
-    partial class Form1
+    partial class DefaultManager
     {
         /// <summary>
         /// Required designer variable.
