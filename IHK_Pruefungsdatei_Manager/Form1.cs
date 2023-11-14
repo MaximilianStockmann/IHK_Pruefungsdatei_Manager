@@ -10,19 +10,36 @@ using System.Windows.Forms;
 
 namespace IHK_Pruefungsdatei_Manager
 {
+    enum DocumentType
+    {
+        Aufgabe,
+        Lösung,
+        Lösungshinweis,
+        Belegsatz
+    }
+
     public partial class DefaultManager : Form
     {
         private Label label1 = new Label();
         GroupBox choiceGrouping = new GroupBox();
         ComboBox yearPicker = new ComboBox();
         ComboBox seasonPicker = new ComboBox();
+        ComboBox tradeDisciplinePicker = new ComboBox();
         GroupBox filePickerGrouping = new GroupBox();
-        Label label = new Label();
 
         private object[] seasons = new object[] {
-        "Frühling",
-        "Winter"
+            "Frühling",
+            "Winter"
         };
+
+        private object[] tradeDisciplines = new object[] {
+            "FIAN",
+            "FISI",
+            "FIDP",
+            "FIDN",
+            "MATSE"
+        };
+
         private object[] years = new object[]
         {
             2024,
@@ -54,9 +71,12 @@ namespace IHK_Pruefungsdatei_Manager
         {
             yearPicker.Items.AddRange(years);
             seasonPicker.Items.AddRange(seasons);
+            tradeDisciplinePicker.Items.AddRange(tradeDisciplines);
 
             choiceGrouping.Controls.Add(seasonPicker);
             choiceGrouping.Controls.Add(yearPicker);
+
+            choiceGrouping.Controls.Add(tradeDisciplinePicker);
 
             // TODO: Add margin to seasonPicker for nicer visual
 
@@ -65,17 +85,28 @@ namespace IHK_Pruefungsdatei_Manager
 
         private void initFilePickerGrouping()
         {
-            //filePickerGrouping.Dock = DockStyle.Fill;
+            int DocumentTypeEnumSize = Enum.GetNames(typeof(DocumentType)).Length;
 
-            filePickerGrouping.Controls.Add(label);
+            for (int i = DocumentTypeEnumSize; i >= 0; i--)
+            {
+                Console.WriteLine(i);
+                Label label = new Label();
+                label.Dock = DockStyle.Top;
+                label.Text = ((DocumentType)i).ToString();
 
+                label.AllowDrop = true;
+                label.DragOver += label_DragOver;
+                label.DragDrop += label_DragDrop;
+                filePickerGrouping.Controls.Add(label);
+            }
 
             this.Controls.Add(filePickerGrouping);
         }
-        public void CreateMyLabel()
+        public Label CreateMyLabel()
         {
+            Label label = new Label();
             // Set the border to a three-dimensional border.
-            label.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            label.BorderStyle = BorderStyle.None;
             // Set the ImageList to use for displaying an image.
             label.ImageList = new ImageList();
 
@@ -97,7 +128,7 @@ namespace IHK_Pruefungsdatei_Manager
             label.DragOver += label_DragOver;
             label.DragDrop += label_DragDrop;
 
-            this.Controls.Add(label);
+            return label;
         }
 
         public void Fullscreen()
@@ -114,11 +145,12 @@ namespace IHK_Pruefungsdatei_Manager
 
         private void initLayout()
         {
-            label.Dock = DockStyle.Top;
             filePickerGrouping.Dock = DockStyle.Top;
             choiceGrouping.Dock = DockStyle.Top;
             yearPicker.Dock = DockStyle.Left;
             seasonPicker.Dock = DockStyle.Left;
+            tradeDisciplinePicker.Dock = DockStyle.Left;
+
         }
 
         // Visual effects on drag hover
