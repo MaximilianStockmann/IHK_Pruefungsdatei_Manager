@@ -170,8 +170,22 @@ namespace IHK_Pruefungsdatei_Manager
                     // TODO: typechecking so that this doesn't throw an error
                     (sender as Label).Text = filePath;
                     Console.WriteLine(filePath);
+                    Console.WriteLine(GenerateFilePath("C:\\Max\\Users\\IHK_Pruefungsdatei_Manager_Testordner\\"));
                 }
             }
+        }
+
+        private string GenerateFilePath(string basePath)
+        {
+            string filePath;
+
+            string year = this.yearPicker.SelectedItem.ToString();
+            string season = this.seasonPicker.SelectedItem.ToString();
+            string tradeDiscipline = this.tradeDisciplinePicker.SelectedItem.ToString();
+
+            filePath = basePath + year + "_" + season + "_" + tradeDiscipline; // how to get doctype here?
+
+            return filePath;
         }
     }
 }
