@@ -16,8 +16,8 @@ namespace IHK_Pruefungsdatei_Manager
     enum DocumentType
     {
         Aufgabe,
-        Lösung,
-        Lösungshinweis,
+        Loesung,
+        Loesungshinweis,
         Belegsatz
     }
 
@@ -33,6 +33,9 @@ namespace IHK_Pruefungsdatei_Manager
         GroupBox filePickerGrouping = new GroupBox();
         Button confirmButton = new Button();
         TableLayoutPanel filePickerTable = new TableLayoutPanel();
+
+        Dictionary<DocumentType, string> DocTypeUIMapping =
+        new Dictionary<DocumentType, string>();
 
         private object[] seasons = new object[] {
             "Frühling",
@@ -62,6 +65,14 @@ namespace IHK_Pruefungsdatei_Manager
             init();
         }
 
+        private void initUIMapping()
+        {
+            DocTypeUIMapping.Add(DocumentType.Aufgabe, "Aufgabe");
+            DocTypeUIMapping.Add(DocumentType.Loesung, "Lösung");
+            DocTypeUIMapping.Add(DocumentType.Loesungshinweis, "Lösungshinweis");
+            DocTypeUIMapping.Add(DocumentType.Belegsatz, "Belegsatz");
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -69,6 +80,7 @@ namespace IHK_Pruefungsdatei_Manager
 
         private void init()
         {
+            initUIMapping();
             this.Fullscreen();
             this.initComponents();
             this.initLayout();
@@ -99,6 +111,7 @@ namespace IHK_Pruefungsdatei_Manager
 
             filePickerGrouping.Controls.Add(this.filePickerTable);
 
+            this.confirmButton.Click += confirmButton_clicked;
             this.confirmButton.Text = "Anwenden";
             this.filePickerGrouping.Controls.Add(this.confirmButton);
             this.confirmButton.Dock = DockStyle.Bottom;
@@ -107,15 +120,15 @@ namespace IHK_Pruefungsdatei_Manager
 
             for (int i = DocumentTypeEnumSize-1; i >= 0; i--)
             {
-                Console.WriteLine(i);
                 Label fileLabel = new Label();
                 Label descriptorLabel = new Label();
 
                 descriptorLabel.Dock = DockStyle.Left;
-                descriptorLabel.Text = ((DocumentType)i).ToString();
+                descriptorLabel.Text = DocTypeUIMapping[(DocumentType)i];
 
                 fileLabel.Dock = DockStyle.Top;
                 fileLabel.Text = "Datei einfügen";
+                fileLabel.Name = ((DocumentType)i).ToString();
 
                 fileLabel.AllowDrop = true;
                 fileLabel.DragOver += label_DragOver;
@@ -129,34 +142,6 @@ namespace IHK_Pruefungsdatei_Manager
 
             this.Controls.Add(filePickerGrouping);
         }
-        public Label CreateMyLabel()
-        {
-            Label label = new Label();
-            // Set the border to a three-dimensional border.
-            label.BorderStyle = BorderStyle.None;
-            // Set the ImageList to use for displaying an image.
-            label.ImageList = new ImageList();
-
-            // Use the second image in imageList1.
-            label.ImageIndex = 1;
-
-            // Align the image to the top left corner.
-            label.ImageAlign = ContentAlignment.TopLeft;
-
-            // Specify that the text can display mnemonic characters.
-            label.UseMnemonic = true;
-            // Set the text of the control and specify a mnemonic character.
-            label.Text = "Test Text:";
-
-            /* Set the size of the control based on the PreferredHeight and PreferredWidth values. */
-            label.Size = new Size(label1.PreferredWidth, label1.PreferredHeight);
-
-            label.AllowDrop = true;
-            label.DragOver += label_DragOver;
-            label.DragDrop += label_DragDrop;
-
-            return label;
-        }
 
         public void Fullscreen()
         {
@@ -165,7 +150,6 @@ namespace IHK_Pruefungsdatei_Manager
 
         private void initComponents()
         {
-            this.CreateMyLabel();
             this.initFilePickerGrouping();
             this.initChoiceGrouping();
         }
@@ -179,7 +163,6 @@ namespace IHK_Pruefungsdatei_Manager
             yearPicker.Dock = DockStyle.Left;
             seasonPicker.Dock = DockStyle.Left;
             tradeDisciplinePicker.Dock = DockStyle.Left;
-
         }
 
         // Visual effects on drag hover
@@ -198,29 +181,62 @@ namespace IHK_Pruefungsdatei_Manager
                 {
                     // TODO: typechecking so that this doesn't throw an error
                     (sender as Label).Text = filePath;
-                    Console.WriteLine(filePath);
-                    writeFile(filePath, GenerateFilePath());
+                }
+            }
+        }
+
+        private void confirmButton_clicked(object sender, EventArgs e)
+        {
+            foreach (Control c in this.filePickerTable.Controls)
+            {
+                Console.WriteLine("In loop");
+                if (c.GetType() == typeof(Label) && c.Text != "Datei einfügen")
+                {
+                    if (c.Name == "Aufgabe")
+                    {
+                        Console.WriteLine("Absolutely in the switch case");
+                        writeFile(c.Text, GenerateFilePath(c as Label));
+                    }
+                    if (c.Name == "Loesung")
+                    {
+                        Console.WriteLine("Loesung");
+                        Console.WriteLine("Absolutely in the switch case");
+                        writeFile(c.Text, GenerateFilePath(c as Label));
+                    }
+                    if (c.Name == "Loesungshinweis")
+                    {
+                        Console.WriteLine("Loesungshinweis");
+                        Console.WriteLine("Absolutely in the switch case");
+                        writeFile(c.Text, GenerateFilePath(c as Label));
+                    }
+                    if (c.Name == "Belegsatz")
+                    {
+                        Console.WriteLine("Belegsatz");
+                        Console.WriteLine("Absolutely in the switch case");
+                        writeFile(c.Text, GenerateFilePath(c as Label));
+                    }
                 }
             }
         }
 
         // TODO: Error handling an automatic generation of missing folders
-        private string GenerateFilePath()
+        private string GenerateFilePath(Label label)
         {
+            Console.WriteLine("In generateFilePath()");
             string filePath;
 
             string year = this.yearPicker.SelectedItem.ToString();
             string season = this.seasonPicker.SelectedItem.ToString();
             string tradeDiscipline = this.tradeDisciplinePicker.SelectedItem.ToString();
 
-            filePath = basePath + year + "_" + season + "_" + tradeDiscipline + ".docx"; // how to get doctype here?
+            filePath = basePath + year + "_" + season + "_" + tradeDiscipline + "_" + label.Name +  ".docx"; // how to get doctype here?
 
             return filePath;
         }
 
         private void writeFile(string filePath, string newFilePath)
         {
-            Console.WriteLine("Test");
+            Console.WriteLine("In writeFile()");
             File.Copy(filePath, newFilePath);
         }
     }
