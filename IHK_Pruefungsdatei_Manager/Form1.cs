@@ -33,6 +33,8 @@ namespace IHK_Pruefungsdatei_Manager
         GroupBox filePickerGrouping = new GroupBox();
         Button confirmButton = new Button();
         TableLayoutPanel filePickerTable = new TableLayoutPanel();
+        RichTextBox pathTextBox = new RichTextBox();
+        FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
 
         Dictionary<DocumentType, string> DocTypeUIMapping =
         new Dictionary<DocumentType, string>();
@@ -91,6 +93,9 @@ namespace IHK_Pruefungsdatei_Manager
             yearPicker.Items.AddRange(years);
             seasonPicker.Items.AddRange(seasons);
             tradeDisciplinePicker.Items.AddRange(tradeDisciplines);
+
+            choiceGrouping.Controls.Add(pathTextBox);
+            pathTextBox.Click += pathTextBox_ClickHandler;
 
             choiceGrouping.Controls.Add(seasonPicker);
             choiceGrouping.Controls.Add(yearPicker);
@@ -163,6 +168,7 @@ namespace IHK_Pruefungsdatei_Manager
             yearPicker.Dock = DockStyle.Left;
             seasonPicker.Dock = DockStyle.Left;
             tradeDisciplinePicker.Dock = DockStyle.Left;
+            pathTextBox.Dock = DockStyle.Left;
         }
 
         // Visual effects on drag hover
@@ -218,6 +224,31 @@ namespace IHK_Pruefungsdatei_Manager
             }
         }
 
+        private void pathTextBox_ClickHandler(object sender , EventArgs e)
+        {
+            // Display the openFile dialog.
+            DialogResult result = folderBrowserDialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                try
+                {
+                    // Output the requested file in richTextBox1.
+                    this.pathTextBox.Text = folderBrowserDialog.SelectedPath;
+                    this.basePath = this.pathTextBox.Text;
+                }
+                catch (Exception exp)
+                {
+                    MessageBox.Show("An error occurred while attempting to load the file. The error is:"
+                                    + System.Environment.NewLine + exp.ToString() + System.Environment.NewLine);
+                }
+                Invalidate();
+            } else if (result == DialogResult.Cancel)
+            {
+                return;
+            }
+        }
+
         // TODO: Error handling an automatic generation of missing folders
         private string GenerateFilePath(Label label)
         {
@@ -228,8 +259,10 @@ namespace IHK_Pruefungsdatei_Manager
             string season = this.seasonPicker.SelectedItem.ToString();
             string tradeDiscipline = this.tradeDisciplinePicker.SelectedItem.ToString();
 
-            filePath = basePath + year + "_" + season + "_" + tradeDiscipline + "_" + label.Name;
+            Console.WriteLine("base Path" + this.basePath);
 
+            filePath = this.basePath + "\\" + year + "_" + season + "_" + tradeDiscipline + "_" + label.Name;
+            
             return filePath;
         }
 
