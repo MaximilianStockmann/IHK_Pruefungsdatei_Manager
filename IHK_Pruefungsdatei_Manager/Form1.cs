@@ -189,7 +189,6 @@ namespace IHK_Pruefungsdatei_Manager
         {
             foreach (Control c in this.filePickerTable.Controls)
             {
-                Console.WriteLine("In loop");
                 if (c.GetType() == typeof(Label) && c.Text != "Datei einfügen")
                 {
                     if (c.Name == "Aufgabe")
@@ -229,14 +228,43 @@ namespace IHK_Pruefungsdatei_Manager
             string season = this.seasonPicker.SelectedItem.ToString();
             string tradeDiscipline = this.tradeDisciplinePicker.SelectedItem.ToString();
 
-            filePath = basePath + year + "_" + season + "_" + tradeDiscipline + "_" + label.Name +  ".docx"; // how to get doctype here?
+            filePath = basePath + year + "_" + season + "_" + tradeDiscipline + "_" + label.Name;
 
             return filePath;
         }
 
         private void writeFile(string filePath, string newFilePath)
         {
-            Console.WriteLine("In writeFile()");
+            Console.WriteLine(Path.GetExtension(filePath));
+            newFilePath = Path.ChangeExtension(newFilePath, Path.GetExtension(filePath));
+
+            string directoryPath = Path.GetDirectoryName(newFilePath);
+            string fileName = Path.GetFileName(newFilePath);
+
+            string[] fileNameParts = fileName.Split('_');
+
+            string subdirectoryYear = fileNameParts[0];
+
+            string subdirectoryYearFull = Path.Combine(directoryPath, subdirectoryYear);
+
+            if (!Directory.Exists(subdirectoryYearFull))
+            {
+                Directory.CreateDirectory(subdirectoryYearFull);
+            }
+
+            if (!Directory.Exists(directoryPath))
+            {
+                Console.WriteLine(directoryPath + " does not exist!");
+            }
+
+            newFilePath = Path.Combine(subdirectoryYearFull, fileName);
+
+            if (File.Exists(newFilePath))
+            {
+                // TODO: this should open a dialog to ask the user
+                File.Delete(newFilePath);
+            }
+
             File.Copy(filePath, newFilePath);
         }
     }
